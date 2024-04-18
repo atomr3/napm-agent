@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CPU Usage Live Plot</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>CPU Usage Live Plot</h1>
+    <canvas id="cpuUsageChart" style="height: 80%; width: 100%"></canvas>
+</body>
+<script>
+    var ctx = document.getElementById('cpuUsageChart').getContext('2d');
+    var cpuUsageChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'CPU Usage (%)',
+                data: [],
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    async function updateCpuUsage() {
+        const response = await fetch('/cpu-usage');
+        const data = await response.json();
+        const time = new Date().toLocaleTimeString();
+        cpuUsageChart.data.labels.push(time);
+        cpuUsageChart.data.datasets[0].data.push(data.cpu_usage_percent);
+        cpuUsageChart.update();
+    }
+
+    setInterval(updateCpuUsage, 1000); // Update every 1 second
+</script>
+</html>
